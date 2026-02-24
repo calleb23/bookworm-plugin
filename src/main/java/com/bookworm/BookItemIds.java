@@ -242,15 +242,24 @@ public class BookItemIds
 		// ── ID 72: Varlamore envoy ────────────────────────────────────────────
 		ITEM_TO_BOOK.put(21756, 72);
 
-		// ── ID 73: Arceuus Library Books ─────────────────────────────────────
-		// TODO: The Arceuus Library has ~16 borrowable texts (e.g. Hosidius letter,
-		// Transportation incantations, Rada's census, etc.) that a player briefly
-		// holds and reads during the library activity. Look up item IDs for each
-		// on the OSRS Wiki and add them here:
-		//   ITEM_TO_BOOK.put(XXXX, 73);  // Hosidius letter
-		//   ITEM_TO_BOOK.put(XXXX, 73);  // Transportation incantations
-		//   ITEM_TO_BOOK.put(XXXX, 73);  // Soul journey
-		//   ... etc.
+		// ── ID 73: Byrne's coronation speech ─────────────────────────────────
+		ITEM_TO_BOOK.put(13531, 73);
+
+		// ── IDs 221-234: Arceuus Library books ───────────────────────────────
+		ITEM_TO_BOOK.put(13526, 221);  // Eathram & rada extract
+		ITEM_TO_BOOK.put(13528, 222);  // Hosidius letter
+		ITEM_TO_BOOK.put(13532, 223);  // Ideology of darkness
+		ITEM_TO_BOOK.put(13527, 224);  // Killing of a king
+		ITEM_TO_BOOK.put(13524, 225);  // Rada's census
+		ITEM_TO_BOOK.put(13533, 226);  // Rada's journey
+		ITEM_TO_BOOK.put(13525, 227);  // Ricktor's diary (7)
+		ITEM_TO_BOOK.put(19637, 228);  // Soul journey
+		ITEM_TO_BOOK.put(13537, 229);  // Transportation incantations
+		ITEM_TO_BOOK.put(13534, 230);  // Transvergence theory
+		ITEM_TO_BOOK.put(13536, 231);  // Treachery of royalty
+		ITEM_TO_BOOK.put(13535, 232);  // Tristessa's tragedy
+		ITEM_TO_BOOK.put(13530, 233);  // Twill accord
+		ITEM_TO_BOOK.put(13529, 234);  // Wintertodt parable
 
 		// ── ID 74: Dwarven lore ───────────────────────────────────────────────
 		ITEM_TO_BOOK.put(4568, 74);
@@ -616,7 +625,7 @@ public class BookItemIds
 		BOOK_NAMES.put(70,  "Smelly journal");
 		BOOK_NAMES.put(71,  "Kasonde's journal");
 		BOOK_NAMES.put(72,  "Varlamore envoy");
-		BOOK_NAMES.put(73,  "Arceuus Library Books");
+		BOOK_NAMES.put(73,  "Byrne's coronation speech");
 		BOOK_NAMES.put(74,  "Dwarven lore");
 		BOOK_NAMES.put(75,  "Tome of the moon");
 		BOOK_NAMES.put(76,  "Tome of the sun");
@@ -765,6 +774,20 @@ public class BookItemIds
 		BOOK_NAMES.put(218, "Entomologist's diary");
 		BOOK_NAMES.put(219, "List of repairs");
 		BOOK_NAMES.put(220, "Captain's Log");
+		BOOK_NAMES.put(221, "Eathram & rada extract");
+		BOOK_NAMES.put(222, "Hosidius letter");
+		BOOK_NAMES.put(223, "Ideology of darkness");
+		BOOK_NAMES.put(224, "Killing of a king");
+		BOOK_NAMES.put(225, "Rada's census");
+		BOOK_NAMES.put(226, "Rada's journey");
+		BOOK_NAMES.put(227, "Ricktor's diary (7)");
+		BOOK_NAMES.put(228, "Soul journey");
+		BOOK_NAMES.put(229, "Transportation incantations");
+		BOOK_NAMES.put(230, "Transvergence theory");
+		BOOK_NAMES.put(231, "Treachery of royalty");
+		BOOK_NAMES.put(232, "Tristessa's tragedy");
+		BOOK_NAMES.put(233, "Twill accord");
+		BOOK_NAMES.put(234, "Wintertodt parable");
 
 		// ── Compute total distinct book IDs ───────────────────────────────────
 		TOTAL_BOOKS = (int) ITEM_TO_BOOK.values().stream().distinct().count();
