@@ -17,6 +17,8 @@ import java.util.function.Consumer;
 @Slf4j
 public class BookwormSocketClient
 {
+	// Derived client with a 25-second ping interval to keep the connection alive
+	// through Railway's proxy (which drops idle WebSocket connections at ~60s).
 	private final OkHttpClient httpClient;
 	private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -31,7 +33,9 @@ public class BookwormSocketClient
 
 	public BookwormSocketClient(OkHttpClient httpClient)
 	{
-		this.httpClient = httpClient;
+		this.httpClient = httpClient.newBuilder()
+			.pingInterval(25, TimeUnit.SECONDS)
+			.build();
 	}
 
 	public void connect(String url)
