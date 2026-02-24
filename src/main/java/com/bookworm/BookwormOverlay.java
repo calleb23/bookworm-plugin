@@ -22,21 +22,21 @@ public class BookwormOverlay extends Overlay
 	private static final long DISPLAY_MS  = 5000;
 	private static final long FADE_IN_MS  = 150;
 	private static final long FADE_OUT_MS = 600;
-	private static final int  WIDTH       = 270;
-	private static final int  PAD_X       = 10;
-	private static final int  PAD_Y       = 7;
-	private static final int  LINE_GAP    = 3;
-	private static final int  TOAST_GAP   = 5;
+	private static final int  WIDTH       = 260;
+	private static final int  TOAST_GAP   = 6;
 
-	// OSRS interface colour palette
-	private static final Color COL_BG           = new Color(0x1a, 0x12, 0x08, 0xff); // deep brown-black
-	private static final Color COL_BORDER_LIT   = new Color(0x9e, 0x7d, 0x44, 0xff); // top/left highlight
-	private static final Color COL_BORDER_MID   = new Color(0x5c, 0x44, 0x20, 0xff); // outer frame
-	private static final Color COL_BORDER_DARK  = new Color(0x0e, 0x0a, 0x04, 0xff); // bottom/right shadow
-	private static final Color COL_DIVIDER      = new Color(0x4a, 0x38, 0x1c, 0xff); // inner divider line
-	private static final Color COL_HEADER_TXT   = new Color(0xff, 0x98, 0x1f, 0xff); // OSRS orange
-	private static final Color COL_NAME_TXT     = new Color(0xff, 0xff, 0xff, 0xff); // white
-	private static final Color COL_COUNT_TXT    = new Color(0xb0, 0x9a, 0x78, 0xff); // muted tan
+	// Matched from the OSRS collection log popup screenshot
+	private static final Color COL_HEADER_BG    = new Color(0x3a, 0x2a, 0x14); // header bar
+	private static final Color COL_BODY_BG      = new Color(0x1e, 0x16, 0x09); // body
+	private static final Color COL_BORDER_OUT   = new Color(0x12, 0x0d, 0x04); // outer edge
+	private static final Color COL_BORDER_LIT   = new Color(0x7a, 0x60, 0x38); // top/left bevel
+	private static final Color COL_BORDER_MID   = new Color(0x50, 0x3c, 0x1c); // frame fill
+	private static final Color COL_CORNER       = new Color(0x8a, 0x6e, 0x42); // corner ornament
+	private static final Color COL_DIVIDER      = new Color(0x50, 0x3c, 0x1c); // header/body line
+	private static final Color COL_TITLE        = new Color(0xe8, 0x94, 0x20); // "Bookworm" amber
+	private static final Color COL_LABEL        = new Color(0xd4, 0x84, 0x18); // "New item:" slightly dimmer
+	private static final Color COL_ITEM         = new Color(0xf0, 0xe8, 0xd8); // warm near-white
+	private static final Color COL_COUNT        = new Color(0x90, 0x80, 0x68); // muted tan
 
 	private final Deque<ToastEntry> toasts = new ArrayDeque<>();
 
@@ -60,9 +60,10 @@ public class BookwormOverlay extends Overlay
 
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-		final Font headerFont = FontManager.getRunescapeSmallFont();
-		final Font nameFont   = FontManager.getRunescapeBoldFont();
-		final Font countFont  = FontManager.getRunescapeSmallFont();
+		final Font titleFont = FontManager.getRunescapeBoldFont();
+		final Font labelFont = FontManager.getRunescapeSmallFont();
+		final Font itemFont  = FontManager.getRunescapeBoldFont();
+		final Font countFont = FontManager.getRunescapeSmallFont();
 
 		final long now = System.currentTimeMillis();
 		final Iterator<ToastEntry> it = toasts.iterator();
@@ -76,85 +77,99 @@ public class BookwormOverlay extends Overlay
 
 			final float alpha = computeAlpha(age);
 
-			// Pre-measure text
-			g.setFont(headerFont);
-			final FontMetrics hFm  = g.getFontMetrics();
-			final int         hH   = hFm.getHeight();
+			g.setFont(titleFont);
+			final FontMetrics titleFm = g.getFontMetrics();
 
-			g.setFont(nameFont);
-			final FontMetrics nFm  = g.getFontMetrics();
-			final String      name = truncate(g, t.bookName, WIDTH - PAD_X * 2);
-			final int         nH   = nFm.getHeight();
+			g.setFont(labelFont);
+			final FontMetrics labelFm = g.getFontMetrics();
+
+			g.setFont(itemFont);
+			final FontMetrics itemFm  = g.getFontMetrics();
+			final String      itemStr = truncate(g, t.bookName, WIDTH - 20);
 
 			g.setFont(countFont);
-			final FontMetrics cFm  = g.getFontMetrics();
-			final int         cH   = cFm.getHeight();
+			final FontMetrics countFm = g.getFontMetrics();
 
-			final int innerH = PAD_Y + hH + LINE_GAP + 1 + LINE_GAP + nH + LINE_GAP + cH + PAD_Y;
+			final int headerH = 6 + titleFm.getHeight() + 6;
+			final int bodyH   = 8 + labelFm.getHeight() + 4 + itemFm.getHeight() + 4 + countFm.getHeight() + 8;
+			final int totalH  = headerH + bodyH + 4; // 4 = 2px border top + 2px border bottom
 
-			drawPanel(g, 0, yOff, WIDTH, innerH, alpha);
+			drawPanel(g, 0, yOff, WIDTH, totalH, headerH, alpha);
 
-			// ── Text ──────────────────────────────────────────────────────────
-			int ty = yOff + PAD_Y;
+			// ── Header: "Bookworm" centred ────────────────────────────────────
+			g.setFont(titleFont);
+			g.setColor(applyAlpha(COL_TITLE, alpha));
+			final String title  = "Bookworm";
+			final int    titleW = titleFm.stringWidth(title);
+			g.drawString(title, (WIDTH - titleW) / 2, yOff + 2 + 6 + titleFm.getAscent());
 
-			// Header: "New Bookworm addition!"
-			g.setFont(headerFont);
-			g.setColor(applyAlpha(COL_HEADER_TXT, alpha));
-			g.drawString("New Bookworm addition!", PAD_X, ty + hFm.getAscent());
-			ty += hH + LINE_GAP;
+			// ── Body text ─────────────────────────────────────────────────────
+			int ty = yOff + 2 + headerH + 8;
 
-			// Thin horizontal divider
-			g.setColor(applyAlpha(COL_DIVIDER, alpha));
-			g.fillRect(PAD_X, ty, WIDTH - PAD_X * 2, 1);
-			ty += 1 + LINE_GAP;
+			g.setFont(labelFont);
+			g.setColor(applyAlpha(COL_LABEL, alpha));
+			g.drawString("New item:", 10, ty + labelFm.getAscent());
+			ty += labelFm.getHeight() + 4;
 
-			// Book name (bold, white)
-			g.setFont(nameFont);
-			g.setColor(applyAlpha(COL_NAME_TXT, alpha));
-			g.drawString(name, PAD_X, ty + nFm.getAscent());
-			ty += nH + LINE_GAP;
+			g.setFont(itemFont);
+			g.setColor(applyAlpha(COL_ITEM, alpha));
+			g.drawString(itemStr, 10, ty + itemFm.getAscent());
+			ty += itemFm.getHeight() + 4;
 
-			// Count (small, muted)
 			g.setFont(countFont);
-			g.setColor(applyAlpha(COL_COUNT_TXT, alpha));
-			g.drawString(t.collected + " / " + t.total + " books", PAD_X, ty + cFm.getAscent());
+			g.setColor(applyAlpha(COL_COUNT, alpha));
+			g.drawString(t.collected + " / " + t.total + " books", 10, ty + countFm.getAscent());
 
-			yOff += innerH + TOAST_GAP;
+			yOff += totalH + TOAST_GAP;
 		}
 
 		return yOff > 0 ? new Dimension(WIDTH, yOff) : null;
 	}
 
-	// ── OSRS-style raised panel ───────────────────────────────────────────────
-	// Outer frame (2px), inner highlight border (1px), dark fill
-	private void drawPanel(Graphics2D g, int x, int y, int w, int h, float alpha)
+	/**
+	 * Draws a two-section OSRS-style panel matching the collection log popup:
+	 * outer dark edge → bevel frame → header bg → divider → body bg.
+	 * Corner ornaments drawn at all four corners.
+	 */
+	private void drawPanel(Graphics2D g, int x, int y, int w, int h, int headerH, float alpha)
 	{
-		// Outer 2-px frame — darker shade on all sides
+		// Outermost 1-px dark edge
+		g.setColor(applyAlpha(COL_BORDER_OUT, alpha));
+		g.drawRect(x, y, w - 1, h - 1);
+
+		// 2-px bevel frame (inset 1px)
 		g.setColor(applyAlpha(COL_BORDER_MID, alpha));
-		g.fillRect(x, y, w, h);
+		g.fillRect(x + 1, y + 1, w - 2, h - 2);
 
-		// 1-px outer shadow on bottom and right
-		g.setColor(applyAlpha(COL_BORDER_DARK, alpha));
-		g.drawLine(x,         y + h - 1, x + w - 1, y + h - 1); // bottom
-		g.drawLine(x + w - 1, y,         x + w - 1, y + h - 1); // right
-
-		// 1-px highlight on top and left
+		// Bevel highlights — top & left lighter
 		g.setColor(applyAlpha(COL_BORDER_LIT, alpha));
-		g.drawLine(x,     y, x + w - 2, y    ); // top
-		g.drawLine(x, y + 1, x,         y + h - 2); // left
+		g.drawLine(x + 1, y + 1, x + w - 3, y + 1);   // top
+		g.drawLine(x + 1, y + 1, x + 1,     y + h - 3); // left
 
-		// Inner background (2px inset)
-		g.setColor(applyAlpha(COL_BG, alpha));
-		g.fillRect(x + 2, y + 2, w - 4, h - 4);
+		// Header background
+		g.setColor(applyAlpha(COL_HEADER_BG, alpha));
+		g.fillRect(x + 2, y + 2, w - 4, headerH);
 
-		// Narrow orange accent strip at very top of inner area
-		g.setColor(applyAlpha(new Color(0xff, 0x98, 0x1f, 0x60), alpha));
-		g.fillRect(x + 2, y + 2, w - 4, 2);
+		// Divider between header and body
+		g.setColor(applyAlpha(COL_DIVIDER, alpha));
+		g.fillRect(x + 2, y + 2 + headerH, w - 4, 1);
+
+		// Body background
+		g.setColor(applyAlpha(COL_BODY_BG, alpha));
+		g.fillRect(x + 2, y + 2 + headerH + 1, w - 4, h - headerH - 5);
+
+		// Corner ornaments (4×4 lighter squares)
+		g.setColor(applyAlpha(COL_CORNER, alpha));
+		g.fillRect(x + 1,     y + 1,     4, 4); // top-left
+		g.fillRect(x + w - 5, y + 1,     4, 4); // top-right
+		g.fillRect(x + 1,     y + h - 5, 4, 4); // bottom-left
+		g.fillRect(x + w - 5, y + h - 5, 4, 4); // bottom-right
 	}
 
 	private float computeAlpha(long age)
 	{
-		if (age < FADE_IN_MS)  return (float) age / FADE_IN_MS;
+		if (age < FADE_IN_MS)
+			return (float) age / FADE_IN_MS;
 		if (age > DISPLAY_MS - FADE_OUT_MS)
 			return 1f - (float)(age - (DISPLAY_MS - FADE_OUT_MS)) / FADE_OUT_MS;
 		return 1f;
