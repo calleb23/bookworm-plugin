@@ -26,17 +26,17 @@ public class BookwormOverlay extends Overlay
 	private static final int  TOAST_GAP   = 6;
 
 	// Matched from the OSRS collection log popup screenshot
-	private static final Color COL_HEADER_BG    = new Color(0x3a, 0x2a, 0x14); // header bar
-	private static final Color COL_BODY_BG      = new Color(0x1e, 0x16, 0x09); // body
-	private static final Color COL_BORDER_OUT   = new Color(0x12, 0x0d, 0x04); // outer edge
-	private static final Color COL_BORDER_LIT   = new Color(0x7a, 0x60, 0x38); // top/left bevel
-	private static final Color COL_BORDER_MID   = new Color(0x50, 0x3c, 0x1c); // frame fill
-	private static final Color COL_CORNER       = new Color(0x8a, 0x6e, 0x42); // corner ornament
-	private static final Color COL_DIVIDER      = new Color(0x50, 0x3c, 0x1c); // header/body line
-	private static final Color COL_TITLE        = new Color(0xe8, 0x94, 0x20); // "Bookworm" amber
-	private static final Color COL_LABEL        = new Color(0xd4, 0x84, 0x18); // "New item:" slightly dimmer
-	private static final Color COL_ITEM         = new Color(0xf0, 0xe8, 0xd8); // warm near-white
-	private static final Color COL_COUNT        = new Color(0x90, 0x80, 0x68); // muted tan
+	private static final Color COL_HEADER_BG    = new Color(0x5a, 0x42, 0x28); // header bar
+	private static final Color COL_BODY_BG      = new Color(0x3a, 0x2c, 0x18); // body
+	private static final Color COL_BORDER_OUT   = new Color(0x26, 0x1c, 0x0c); // outer edge
+	private static final Color COL_BORDER_LIT   = new Color(0xb0, 0x8c, 0x50); // top/left bevel
+	private static final Color COL_BORDER_MID   = new Color(0x78, 0x5c, 0x2c); // frame fill
+	private static final Color COL_CORNER       = new Color(0xc8, 0xa4, 0x60); // corner ornament
+	private static final Color COL_DIVIDER      = new Color(0x78, 0x5c, 0x2c); // header/body line
+	private static final Color COL_TITLE        = new Color(0xff, 0xcc, 0x44); // "Bookworm" gold
+	private static final Color COL_LABEL        = new Color(0xe8, 0xa8, 0x30); // "New item:" gold
+	private static final Color COL_ITEM         = new Color(0xff, 0xf4, 0xe4); // bright warm white
+	private static final Color COL_COUNT        = new Color(0xb8, 0xa8, 0x88); // muted tan
 
 	private final Deque<ToastEntry> toasts = new ArrayDeque<>();
 
