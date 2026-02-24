@@ -103,12 +103,12 @@ public class BookwormOverlay extends Overlay
 
 			g.setFont(labelFont);
 			g.setColor(applyAlpha(COL_LABEL, alpha));
-			g.drawString("New item:", 10, ty + labelFm.getAscent());
+			g.drawString("New item:", (WIDTH - labelFm.stringWidth("New item:")) / 2, ty + labelFm.getAscent());
 			ty += labelFm.getHeight() + 4;
 
 			g.setFont(itemFont);
 			g.setColor(applyAlpha(COL_ITEM, alpha));
-			g.drawString(itemStr, 10, ty + itemFm.getAscent());
+			g.drawString(itemStr, (WIDTH - itemFm.stringWidth(itemStr)) / 2, ty + itemFm.getAscent());
 
 			yOff += totalH + TOAST_GAP;
 		}
