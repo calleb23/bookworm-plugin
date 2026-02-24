@@ -36,7 +36,6 @@ public class BookwormOverlay extends Overlay
 	private static final Color COL_TITLE        = new Color(0xff, 0xcc, 0x44); // "Bookworm" gold
 	private static final Color COL_LABEL        = new Color(0xe8, 0xa8, 0x30); // "New item:" gold
 	private static final Color COL_ITEM         = new Color(0xff, 0xf4, 0xe4); // bright warm white
-	private static final Color COL_COUNT        = new Color(0xb8, 0xa8, 0x88); // muted tan
 
 	private final Deque<ToastEntry> toasts = new ArrayDeque<>();
 
@@ -48,9 +47,9 @@ public class BookwormOverlay extends Overlay
 		setPriority(OverlayPriority.HIGH);
 	}
 
-	public void addToast(String bookName, int collected, int total)
+	public void addToast(String bookName)
 	{
-		toasts.addLast(new ToastEntry(bookName, collected, total, System.currentTimeMillis()));
+		toasts.addLast(new ToastEntry(bookName, System.currentTimeMillis()));
 	}
 
 	@Override
@@ -63,7 +62,6 @@ public class BookwormOverlay extends Overlay
 		final Font titleFont = FontManager.getRunescapeBoldFont();
 		final Font labelFont = FontManager.getRunescapeSmallFont();
 		final Font itemFont  = FontManager.getRunescapeBoldFont();
-		final Font countFont = FontManager.getRunescapeSmallFont();
 
 		final long now = System.currentTimeMillis();
 		final Iterator<ToastEntry> it = toasts.iterator();
@@ -87,11 +85,8 @@ public class BookwormOverlay extends Overlay
 			final FontMetrics itemFm  = g.getFontMetrics();
 			final String      itemStr = truncate(g, t.bookName, WIDTH - 20);
 
-			g.setFont(countFont);
-			final FontMetrics countFm = g.getFontMetrics();
-
 			final int headerH = 6 + titleFm.getHeight() + 6;
-			final int bodyH   = 8 + labelFm.getHeight() + 4 + itemFm.getHeight() + 4 + countFm.getHeight() + 8;
+			final int bodyH   = 8 + labelFm.getHeight() + 4 + itemFm.getHeight() + 8;
 			final int totalH  = headerH + bodyH + 4; // 4 = 2px border top + 2px border bottom
 
 			drawPanel(g, 0, yOff, WIDTH, totalH, headerH, alpha);
@@ -114,11 +109,6 @@ public class BookwormOverlay extends Overlay
 			g.setFont(itemFont);
 			g.setColor(applyAlpha(COL_ITEM, alpha));
 			g.drawString(itemStr, 10, ty + itemFm.getAscent());
-			ty += itemFm.getHeight() + 4;
-
-			g.setFont(countFont);
-			g.setColor(applyAlpha(COL_COUNT, alpha));
-			g.drawString(t.collected + " / " + t.total + " books", 10, ty + countFm.getAscent());
 
 			yOff += totalH + TOAST_GAP;
 		}
@@ -193,15 +183,11 @@ public class BookwormOverlay extends Overlay
 	private static class ToastEntry
 	{
 		final String bookName;
-		final int    collected;
-		final int    total;
 		final long   createdAt;
 
-		ToastEntry(String bookName, int collected, int total, long createdAt)
+		ToastEntry(String bookName, long createdAt)
 		{
 			this.bookName  = bookName;
-			this.collected = collected;
-			this.total     = total;
 			this.createdAt = createdAt;
 		}
 	}

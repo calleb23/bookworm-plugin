@@ -336,7 +336,7 @@ public class BookwormPlugin extends Plugin
 			// Test mode: always fire notifications, never persist, reset immediately
 			collectedBookIds.remove(bookId);
 			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
-			fireNotifications(bookName, collectedBookIds.size());
+			fireNotifications(bookName);
 			return;
 		}
 
@@ -350,7 +350,7 @@ public class BookwormPlugin extends Plugin
 
 			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
 
-			fireNotifications(bookName, collectedBookIds.size());
+			fireNotifications(bookName);
 
 			// Update sidebar panel
 			if (panel != null) panel.addBook(bookName);
@@ -359,12 +359,12 @@ public class BookwormPlugin extends Plugin
 		}
 	}
 
-	private void fireNotifications(String bookName, int count)
+	private void fireNotifications(String bookName)
 	{
 		// In-game OSRS-style popup overlay
 		if (config.showNotification() != net.runelite.client.config.Notification.OFF)
 		{
-			overlay.addToast(bookName, count, BookItemIds.TOTAL_BOOKS);
+			overlay.addToast(bookName);
 		}
 
 		// Optional chat message
