@@ -115,6 +115,9 @@ public class BookwormPlugin extends Plugin
 
 		socketClient = new BookwormSocketClient(okHttpClient);
 		socketClient.setMessageListener(this::onRelayMessage);
+		socketClient.setConnectionListener(connected -> {
+			if (panel != null) panel.setRelayStatus(connected);
+		});
 		if (config.enabled())
 		{
 			socketClient.connect(config.serverUrl());
@@ -192,7 +195,7 @@ public class BookwormPlugin extends Plugin
 		Integer bookId = BookItemIds.ITEM_TO_BOOK.get(itemId);
 		if (bookId != null)
 		{
-			addCollectedBook(bookId);
+			bookRead(bookId);
 		}
 	}
 
@@ -208,7 +211,7 @@ public class BookwormPlugin extends Plugin
 			Integer bookId = BookItemIds.ITEM_TO_BOOK.get(item.getId());
 			if (bookId != null)
 			{
-				addCollectedBook(bookId);
+				trackBook(bookId);
 			}
 		}
 	}
@@ -327,36 +330,51 @@ public class BookwormPlugin extends Plugin
 		log.debug("Bookworm: full sync sent for {}", playerName);
 	}
 
-	private void addCollectedBook(int bookId)
+	/**
+	 * Called when the player actively reads a book (via menu click).
+	 * Normal mode: notifies + saves only on first collection.
+	 * Test mode: always notifies, never saves/syncs (for recording footage).
+	 */
+	private void bookRead(int bookId)
 	{
-		boolean isNew = collectedBookIds.add(bookId);
+		String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
 
 		if (config.testMode())
 		{
-			// Test mode: always fire notifications, never persist, reset immediately
-			collectedBookIds.remove(bookId);
-			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
+			// Test mode: always notify, never persist or sync
 			fireNotifications(bookName);
 			return;
 		}
 
+		// Normal mode: notify and save only if this is a newly collected book
+		boolean isNew = trackBook(bookId);
 		if (isNew)
 		{
-			saveCollectedBooks();
-
-			Map<String, Object> data = new LinkedHashMap<>();
-			data.put("bookId", bookId);
-			sendJson("bookCollected", data);
-
-			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
-
 			fireNotifications(bookName);
-
-			// Update sidebar panel
-			if (panel != null) panel.addBook(bookName);
-
-			log.debug("Bookworm: book {} ({}) collected", bookId, bookName);
 		}
+	}
+
+	/**
+	 * Silently adds a book to the collected set without firing any notification.
+	 * Used by passive inventory scanning and the initial full sync.
+	 * Returns true if the book was newly added (first time seen).
+	 */
+	private boolean trackBook(int bookId)
+	{
+		boolean isNew = collectedBookIds.add(bookId);
+		if (!isNew) return false;
+
+		String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
+		saveCollectedBooks();
+
+		Map<String, Object> data = new LinkedHashMap<>();
+		data.put("bookId", bookId);
+		sendJson("bookCollected", data);
+
+		if (panel != null) panel.addBook(bookName);
+
+		log.debug("Bookworm: book {} ({}) collected", bookId, bookName);
+		return true;
 	}
 
 	private void fireNotifications(String bookName)
@@ -372,7 +390,7 @@ public class BookwormPlugin extends Plugin
 		{
 			String msg = new ChatMessageBuilder()
 				.append(ChatColorType.HIGHLIGHT)
-				.append("New book added to your Bookworm collection: ")
+				.append("Bookworm: ")
 				.append(ChatColorType.NORMAL)
 				.append(bookName)
 				.build();

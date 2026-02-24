@@ -11,6 +11,7 @@ import java.util.List;
 
 public class BookwormPanel extends PluginPanel
 {
+	private final JLabel relayLabel   = new JLabel("● Relay: connecting...");
 	private final JLabel statusLabel  = new JLabel("Not logged in");
 	private final JLabel countLabel   = new JLabel("0 books collected");
 	private final DefaultListModel<String> bookListModel = new DefaultListModel<>();
@@ -30,15 +31,23 @@ public class BookwormPanel extends PluginPanel
 		title.setFont(FontManager.getRunescapeBoldFont());
 		title.setForeground(Color.WHITE);
 
+		relayLabel.setFont(FontManager.getRunescapeSmallFont());
+		relayLabel.setForeground(Color.YELLOW);
+
 		statusLabel.setFont(FontManager.getRunescapeSmallFont());
 		statusLabel.setForeground(Color.GRAY);
 
 		countLabel.setFont(FontManager.getRunescapeSmallFont());
 		countLabel.setForeground(new Color(0x90ee90));
 
-		header.add(title,       BorderLayout.NORTH);
-		header.add(statusLabel, BorderLayout.CENTER);
-		header.add(countLabel,  BorderLayout.SOUTH);
+		JPanel headerLabels = new JPanel(new GridLayout(3, 1, 0, 2));
+		headerLabels.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		headerLabels.add(relayLabel);
+		headerLabels.add(statusLabel);
+		headerLabels.add(countLabel);
+
+		header.add(title,        BorderLayout.NORTH);
+		header.add(headerLabels, BorderLayout.CENTER);
 
 		// ── Book list ─────────────────────────────────────────────────────────
 		bookList.setBackground(ColorScheme.DARKER_GRAY_COLOR);
@@ -52,6 +61,16 @@ public class BookwormPanel extends PluginPanel
 
 		add(header, BorderLayout.NORTH);
 		add(scroll,  BorderLayout.CENTER);
+	}
+
+	/** Updates the relay connection indicator. */
+	public void setRelayStatus(boolean connected)
+	{
+		SwingUtilities.invokeLater(() ->
+		{
+			relayLabel.setText(connected ? "● Relay: connected" : "● Relay: disconnected");
+			relayLabel.setForeground(connected ? new Color(0x90ee90) : Color.RED);
+		});
 	}
 
 	/** Called when the player logs in or the plugin connects. */

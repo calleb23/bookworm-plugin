@@ -27,6 +27,7 @@ public class BookwormSocketClient
 	private ScheduledFuture<?> reconnectFuture;
 	private int reconnectDelaySec = 5;
 	private Consumer<String> messageListener;
+	private Consumer<Boolean> connectionListener;
 
 	public BookwormSocketClient(OkHttpClient httpClient)
 	{
@@ -54,9 +55,10 @@ public class BookwormSocketClient
 			@Override
 			public void onOpen(WebSocket ws, Response response)
 			{
-				log.debug("Bookworm: connected to relay at {}", url);
+				log.info("Bookworm: connected to relay at {}", url);
 				connected.set(true);
 				reconnectDelaySec = 5;
+				if (connectionListener != null) connectionListener.accept(true);
 			}
 
 			@Override
@@ -72,7 +74,8 @@ public class BookwormSocketClient
 			public void onFailure(WebSocket ws, Throwable t, Response response)
 			{
 				connected.set(false);
-				log.debug("Bookworm: connection failed — {}", t.getMessage());
+				log.warn("Bookworm: connection failed — {}", t.getMessage());
+				if (connectionListener != null) connectionListener.accept(false);
 				scheduleReconnect();
 			}
 
@@ -80,7 +83,8 @@ public class BookwormSocketClient
 			public void onClosed(WebSocket ws, int code, String reason)
 			{
 				connected.set(false);
-				log.debug("Bookworm: disconnected ({})", reason);
+				log.info("Bookworm: disconnected ({})", reason);
+				if (connectionListener != null) connectionListener.accept(false);
 				scheduleReconnect();
 			}
 		});
@@ -100,6 +104,12 @@ public class BookwormSocketClient
 	public void setMessageListener(Consumer<String> listener)
 	{
 		this.messageListener = listener;
+	}
+
+	/** Set a listener for connection state changes (true = connected, false = disconnected). */
+	public void setConnectionListener(Consumer<Boolean> listener)
+	{
+		this.connectionListener = listener;
 	}
 
 	/** Send a JSON string to the relay. No-op if not connected. */
