@@ -16,6 +16,7 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.StatChanged;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
@@ -58,6 +59,8 @@ public class BookwormPlugin extends Plugin
 	@Inject private ConfigManager configManager;
 	@Inject private BookwormConfig config;
 	@Inject private OkHttpClient okHttpClient;
+	@Inject private OverlayManager overlayManager;
+	@Inject private BookwormOverlay overlay;
 
 	private BookwormSocketClient socketClient;
 	private BookwormPanel panel;
@@ -108,6 +111,7 @@ public class BookwormPlugin extends Plugin
 			.panel(panel)
 			.build();
 		clientToolbar.addNavigation(navButton);
+		overlayManager.add(overlay);
 
 		socketClient = new BookwormSocketClient(okHttpClient);
 		socketClient.setMessageListener(this::onRelayMessage);
@@ -130,6 +134,7 @@ public class BookwormPlugin extends Plugin
 		pendingSync = false;
 		initialSyncDone = false;
 		clientToolbar.removeNavigation(navButton);
+		overlayManager.remove(overlay);
 	}
 
 	// ── Events ───────────────────────────────────────────────────────────────
@@ -356,22 +361,13 @@ public class BookwormPlugin extends Plugin
 
 	private void fireNotifications(String bookName, int count)
 	{
-		// Collection log style in-game popup
+		// In-game OSRS-style popup overlay
 		if (config.showNotification() != net.runelite.client.config.Notification.OFF)
 		{
-			String popup = new ChatMessageBuilder()
-				.append(ChatColorType.HIGHLIGHT)
-				.append("New item added to your collection log: ")
-				.append(ChatColorType.NORMAL)
-				.append(bookName)
-				.build();
-			chatMessageManager.queue(QueuedMessage.builder()
-				.type(ChatMessageType.GAMEMESSAGE)
-				.runeLiteFormattedMessage(popup)
-				.build());
+			overlay.addToast(bookName, count, BookItemIds.TOTAL_BOOKS);
 		}
 
-		// Optional plain chat message
+		// Optional chat message
 		if (config.showChatMessage())
 		{
 			String msg = new ChatMessageBuilder()
