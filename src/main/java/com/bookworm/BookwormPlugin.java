@@ -366,7 +366,7 @@ public class BookwormPlugin extends Plugin
 				.append(bookName)
 				.build();
 			chatMessageManager.queue(QueuedMessage.builder()
-				.type(ChatMessageType.COLLECTION_LOG)
+				.type(ChatMessageType.GAMEMESSAGE)
 				.runeLiteFormattedMessage(popup)
 				.build());
 		}
