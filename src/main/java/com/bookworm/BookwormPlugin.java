@@ -333,9 +333,9 @@ public class BookwormPlugin extends Plugin
 			// Test mode: always fire notifications, never persist, reset immediately
 			collectedBookIds.remove(bookId);
 			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
-			if (config.showNotification())
+			if (config.showNotification() != net.runelite.client.config.Notification.OFF)
 			{
-				notifier.notify("[TEST] Bookworm notification working! Book: " + bookName);
+				notifier.notify(config.showNotification(), "[TEST] Bookworm notification working! Book: " + bookName);
 			}
 			if (config.showChatMessage())
 			{
@@ -364,9 +364,9 @@ public class BookwormPlugin extends Plugin
 			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
 
 			// RuneLite notifier (same popup system as pet drops, rare drops, etc.)
-			if (config.showNotification())
+			if (config.showNotification() != net.runelite.client.config.Notification.OFF)
 			{
-				notifier.notify("New book added to Bookworm: " + bookName
+				notifier.notify(config.showNotification(), "New book added to Bookworm: " + bookName
 					+ " (" + collectedBookIds.size() + "/" + BookItemIds.TOTAL_BOOKS + ")");
 			}
 

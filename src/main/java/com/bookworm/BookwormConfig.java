@@ -3,6 +3,7 @@ package com.bookworm;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Notification;
 
 @ConfigGroup("bookworm")
 public interface BookwormConfig extends Config
@@ -35,9 +36,9 @@ public interface BookwormConfig extends Config
 		description = "Show a RuneLite notification when a new book is collected",
 		position = 3
 	)
-	default boolean showNotification()
+	default Notification showNotification()
 	{
-		return true;
+		return Notification.ON;
 	}
 
 	@ConfigItem(
