@@ -10,6 +10,7 @@ import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.Skill;
+import net.runelite.api.VarPlayer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
@@ -211,10 +212,18 @@ public class BookwormPlugin extends Plugin
 			Integer bookId = BookItemIds.ITEM_TO_BOOK.get(item.getId());
 			if (bookId != null)
 			{
-				trackBook(bookId);
+				// Fire notification + sync for books that don't have a "Read" option
+				// (e.g. received from chests, rewards, or NPCs).
+				boolean isNew = trackBook(bookId);
+				if (isNew)
+				{
+					String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
+					fireNotifications(bookName);
+				}
 			}
 		}
 	}
+
 
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
@@ -303,13 +312,14 @@ public class BookwormPlugin extends Plugin
 		booksData.put("bookIds", new ArrayList<>(collectedBookIds));
 		sendJson("syncAllBooks", booksData);
 
-		// 4. all skill levels (including Quest Points)
+		// 4. all skill levels + Quest Points
 		Map<String, Integer> skills = new LinkedHashMap<>();
 		for (Skill skill : Skill.values())
 		{
 			if (skill == Skill.OVERALL) continue;
 			skills.put(toWebAppSkillName(skill), client.getRealSkillLevel(skill));
 		}
+		skills.put("Quest Points", client.getVarpValue(VarPlayer.QUEST_POINTS));
 		Map<String, Object> skillsData = new LinkedHashMap<>();
 		skillsData.put("skills", skills);
 		sendJson("syncAllSkills", skillsData);
