@@ -336,7 +336,7 @@ public class BookwormPlugin extends Plugin
 			// Test mode: always fire notifications, never persist, reset immediately
 			collectedBookIds.remove(bookId);
 			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
-			fireNotifications(bookName, 0);
+			fireNotifications(bookName, collectedBookIds.size());
 			return;
 		}
 
