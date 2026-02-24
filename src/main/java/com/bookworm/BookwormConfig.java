@@ -50,4 +50,15 @@ public interface BookwormConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "testMode",
+		name = "Test mode",
+		description = "Fire notifications on every book read without saving — turn off when done testing",
+		position = 5
+	)
+	default boolean testMode()
+	{
+		return false;
+	}
 }

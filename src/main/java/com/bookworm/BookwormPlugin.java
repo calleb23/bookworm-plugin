@@ -326,7 +326,34 @@ public class BookwormPlugin extends Plugin
 
 	private void addCollectedBook(int bookId)
 	{
-		if (collectedBookIds.add(bookId))
+		boolean isNew = collectedBookIds.add(bookId);
+
+		if (config.testMode())
+		{
+			// Test mode: always fire notifications, never persist, reset immediately
+			collectedBookIds.remove(bookId);
+			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
+			if (config.showNotification())
+			{
+				notifier.notify("[TEST] Bookworm notification working! Book: " + bookName);
+			}
+			if (config.showChatMessage())
+			{
+				String message = new ChatMessageBuilder()
+					.append(ChatColorType.HIGHLIGHT)
+					.append("[TEST] Bookworm notification: ")
+					.append(ChatColorType.NORMAL)
+					.append(bookName)
+					.build();
+				chatMessageManager.queue(QueuedMessage.builder()
+					.type(ChatMessageType.CONSOLE)
+					.runeLiteFormattedMessage(message)
+					.build());
+			}
+			return;
+		}
+
+		if (isNew)
 		{
 			saveCollectedBooks();
 
