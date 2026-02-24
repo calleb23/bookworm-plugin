@@ -10,7 +10,7 @@ public interface BookwormConfig extends Config
 	@ConfigItem(
 		keyName = "serverUrl",
 		name = "Server URL",
-		description = "WebSocket relay address (e.g. ws://localhost:3000/plugin-relay)",
+		description = "WebSocket relay address",
 		position = 1
 	)
 	default String serverUrl()
@@ -30,12 +30,12 @@ public interface BookwormConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "showCollectionPopup",
-		name = "Collection log pop-up",
-		description = "Show an in-game overlay when a new book is collected",
+		keyName = "showNotification",
+		name = "Desktop notification",
+		description = "Show a RuneLite notification when a new book is collected",
 		position = 3
 	)
-	default boolean showCollectionPopup()
+	default boolean showNotification()
 	{
 		return true;
 	}

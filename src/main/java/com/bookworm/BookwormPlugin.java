@@ -15,6 +15,7 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.StatChanged;
+import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
@@ -27,7 +28,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
-import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ImageUtil;
 import okhttp3.OkHttpClient;
 
@@ -59,8 +59,7 @@ public class BookwormPlugin extends Plugin
 	@Inject private ConfigManager configManager;
 	@Inject private BookwormConfig config;
 	@Inject private OkHttpClient okHttpClient;
-	@Inject private OverlayManager overlayManager;
-	@Inject private BookwormOverlay overlay;
+	@Inject private Notifier notifier;
 
 	private BookwormSocketClient socketClient;
 	private BookwormPanel panel;
@@ -111,7 +110,6 @@ public class BookwormPlugin extends Plugin
 			.panel(panel)
 			.build();
 		clientToolbar.addNavigation(navButton);
-		overlayManager.add(overlay);
 
 		socketClient = new BookwormSocketClient(okHttpClient);
 		socketClient.setMessageListener(this::onRelayMessage);
@@ -134,7 +132,6 @@ public class BookwormPlugin extends Plugin
 		pendingSync = false;
 		initialSyncDone = false;
 		clientToolbar.removeNavigation(navButton);
-		overlayManager.remove(overlay);
 	}
 
 	// ── Events ───────────────────────────────────────────────────────────────
@@ -300,7 +297,7 @@ public class BookwormPlugin extends Plugin
 		booksData.put("bookIds", new ArrayList<>(collectedBookIds));
 		sendJson("syncAllBooks", booksData);
 
-		// 3. all skill levels (including Quest Points)
+		// 4. all skill levels (including Quest Points)
 		Map<String, Integer> skills = new LinkedHashMap<>();
 		for (Skill skill : Skill.values())
 		{
@@ -339,10 +336,11 @@ public class BookwormPlugin extends Plugin
 
 			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
 
-			// In-game collection log pop-up overlay
-			if (config.showCollectionPopup())
+			// RuneLite notifier (same popup system as pet drops, rare drops, etc.)
+			if (config.showNotification())
 			{
-				overlay.addToast(bookName, collectedBookIds.size(), BookItemIds.TOTAL_BOOKS);
+				notifier.notify("New book added to Bookworm: " + bookName
+					+ " (" + collectedBookIds.size() + "/" + BookItemIds.TOTAL_BOOKS + ")");
 			}
 
 			// Chat notification
