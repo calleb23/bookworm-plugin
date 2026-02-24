@@ -15,7 +15,6 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.StatChanged;
-import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
@@ -59,7 +58,6 @@ public class BookwormPlugin extends Plugin
 	@Inject private ConfigManager configManager;
 	@Inject private BookwormConfig config;
 	@Inject private OkHttpClient okHttpClient;
-	@Inject private Notifier notifier;
 
 	private BookwormSocketClient socketClient;
 	private BookwormPanel panel;
@@ -333,23 +331,7 @@ public class BookwormPlugin extends Plugin
 			// Test mode: always fire notifications, never persist, reset immediately
 			collectedBookIds.remove(bookId);
 			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
-			if (config.showNotification() != net.runelite.client.config.Notification.OFF)
-			{
-				notifier.notify(config.showNotification(), "[TEST] Bookworm notification working! Book: " + bookName);
-			}
-			if (config.showChatMessage())
-			{
-				String message = new ChatMessageBuilder()
-					.append(ChatColorType.HIGHLIGHT)
-					.append("[TEST] Bookworm notification: ")
-					.append(ChatColorType.NORMAL)
-					.append(bookName)
-					.build();
-				chatMessageManager.queue(QueuedMessage.builder()
-					.type(ChatMessageType.CONSOLE)
-					.runeLiteFormattedMessage(message)
-					.build());
-			}
+			fireNotifications(bookName, 0);
 			return;
 		}
 
@@ -363,32 +345,45 @@ public class BookwormPlugin extends Plugin
 
 			String bookName = BookItemIds.BOOK_NAMES.getOrDefault(bookId, "Book #" + bookId);
 
-			// RuneLite notifier (same popup system as pet drops, rare drops, etc.)
-			if (config.showNotification() != net.runelite.client.config.Notification.OFF)
-			{
-				notifier.notify(config.showNotification(), "New book added to Bookworm: " + bookName
-					+ " (" + collectedBookIds.size() + "/" + BookItemIds.TOTAL_BOOKS + ")");
-			}
-
-			// Chat notification
-			if (config.showChatMessage())
-			{
-				String message = new ChatMessageBuilder()
-					.append(ChatColorType.HIGHLIGHT)
-					.append("New book added to your Bookworm collection: ")
-					.append(ChatColorType.NORMAL)
-					.append(bookName)
-					.build();
-				chatMessageManager.queue(QueuedMessage.builder()
-					.type(ChatMessageType.CONSOLE)
-					.runeLiteFormattedMessage(message)
-					.build());
-			}
+			fireNotifications(bookName, collectedBookIds.size());
 
 			// Update sidebar panel
 			if (panel != null) panel.addBook(bookName);
 
 			log.debug("Bookworm: book {} ({}) collected", bookId, bookName);
+		}
+	}
+
+	private void fireNotifications(String bookName, int count)
+	{
+		// Collection log style in-game popup
+		if (config.showNotification() != net.runelite.client.config.Notification.OFF)
+		{
+			String popup = new ChatMessageBuilder()
+				.append(ChatColorType.HIGHLIGHT)
+				.append("New item added to your collection log: ")
+				.append(ChatColorType.NORMAL)
+				.append(bookName)
+				.build();
+			chatMessageManager.queue(QueuedMessage.builder()
+				.type(ChatMessageType.COLLECTION_LOG)
+				.runeLiteFormattedMessage(popup)
+				.build());
+		}
+
+		// Optional plain chat message
+		if (config.showChatMessage())
+		{
+			String msg = new ChatMessageBuilder()
+				.append(ChatColorType.HIGHLIGHT)
+				.append("New book added to your Bookworm collection: ")
+				.append(ChatColorType.NORMAL)
+				.append(bookName)
+				.build();
+			chatMessageManager.queue(QueuedMessage.builder()
+				.type(ChatMessageType.GAMEMESSAGE)
+				.runeLiteFormattedMessage(msg)
+				.build());
 		}
 	}
 

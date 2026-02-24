@@ -32,8 +32,8 @@ public interface BookwormConfig extends Config
 
 	@ConfigItem(
 		keyName = "showNotification",
-		name = "Desktop notification",
-		description = "Show a RuneLite notification when a new book is collected",
+		name = "Collection log popup",
+		description = "Show an in-game collection log style popup when a new book is collected",
 		position = 3
 	)
 	default Notification showNotification()
