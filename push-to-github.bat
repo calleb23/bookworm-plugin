@@ -23,7 +23,7 @@ echo   Username: calleb23
 echo   Password: your Personal Access Token (NOT your GitHub password)
 echo.
 
-git push -u origin main
+git push -u origin master
 
 echo.
 if %errorlevel%==0 (
