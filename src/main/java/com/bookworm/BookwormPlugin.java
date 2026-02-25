@@ -63,10 +63,11 @@ public class BookwormPlugin extends Plugin
 	@Inject private OverlayManager overlayManager;
 	@Inject private BookwormOverlay overlay;
 
+	@Inject private Gson gson;
+
 	private BookwormSocketClient socketClient;
 	private BookwormPanel panel;
 	private NavigationButton navButton;
-	private final Gson gson = new Gson();
 	private final Set<Integer> collectedBookIds = new HashSet<>();
 
 	// API token stored per RS account — loaded from RSProfile config on startup

@@ -15,7 +15,6 @@ import java.util.Map;
  *   - Books 201-220 are zone-duplicates of existing books (same item, different
  *     unlock condition) – they share the same item IDs as their primary entry.
  *   - The plugin works fine with a partial mapping; unregistered items are ignored.
- *   - TODO items mark IDs that still need to be looked up.
  */
 public class BookItemIds
 {

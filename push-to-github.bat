@@ -1,5 +1,5 @@
 @echo off
-cd /d "%~dp0"
+cd C:\Users\Caleb\Desktop\Kingdom\Code\Claude\bookworm-plugin "%~dp0"
 
 :: Anonymous author — your name/email won't appear in commits
 set GIT_AUTHOR_NAME=bookworm-dev

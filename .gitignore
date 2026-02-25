@@ -2,6 +2,9 @@
 build/
 *.class
 
+# Dev scripts
+push-to-github.bat
+
 # IntelliJ
 .idea/
 *.iml
