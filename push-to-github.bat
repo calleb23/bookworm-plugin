@@ -1,5 +1,5 @@
 @echo off
-cd C:\Users\Caleb\Desktop\Kingdom\Code\Claude\bookworm-plugin "%~dp0"
+cd /d "%~dp0"
 
 :: Anonymous author — your name/email won't appear in commits
 set GIT_AUTHOR_NAME=bookworm-dev
@@ -18,16 +18,16 @@ if %errorlevel%==1 (
 
 echo.
 echo === Pushing to GitHub ===
-echo When prompted, enter:
-echo   Username: calleb23
-echo   Password: your Personal Access Token (NOT your GitHub password)
-echo.
-
 git push -u origin master
 
 echo.
 if %errorlevel%==0 (
-    echo === SUCCESS! Plugin is on GitHub ===
+    echo === SUCCESS! ===
+    echo.
+    echo Your new commit hash is:
+    git log --oneline -1
+    echo.
+    echo Copy that hash and update the commit= line in your plugin-hub manifest file on GitHub.
 ) else (
     echo === Push failed - check your token and try again ===
 )
